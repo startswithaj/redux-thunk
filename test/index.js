@@ -94,6 +94,34 @@ describe('thunk middleware', () => {
     });
   });
 
+  describe('Array syntax DI', () => {
+    const service1 = {}; const service2 = {};
+    const services = { service1, service2 };
+    function getService(serviceName) { return services[serviceName]; }
+    const thunkMiddlewareWithServices = thunkMiddleware.withExtraArgument(null, getService);
+    const nextHandlerDI = thunkMiddlewareWithServices({ dispatch: doDispatch, getState: doGetState });
+    it('action gets services injected', done => {
+      const arrayAction = ['dispatch', 'getState', 'service1', 'service2',
+        (dispatch, getState, svc1, svc2) => {
+          chai.assert.strictEqual(dispatch, doDispatch);
+          chai.assert.strictEqual(getState, doGetState);
+          chai.assert.strictEqual(svc1, service1);
+          chai.assert.strictEqual(svc2, service2);
+          done();
+        },
+      ];
+      const actionHandler = nextHandlerDI();
+      actionHandler(arrayAction);
+    });
+    it('must throw if cannot resolve service', () => {
+      const arrayAction = ['serviceThatDoesNotResolve', (svcDoesntExist) => svcDoesntExist];
+      const actionHandler = nextHandlerDI();
+      chai.assert.throws(
+        () => {actionHandler(arrayAction);},
+        'Thunk DI Error: could not get service: serviceThatDoesNotResolve'
+      );
+    });
+  });
   describe('TypeScript definitions', function test() {
     this.timeout(0);
 

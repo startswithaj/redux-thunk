@@ -1,5 +1,5 @@
 {
-  "name": "redux-thunk",
+  "name": "redux-thunk-extended",
   "version": "2.1.0",
   "description": "Thunk middleware for Redux.",
   "main": "lib/index.js",
