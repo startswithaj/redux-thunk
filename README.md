@@ -1,9 +1,43 @@
-Redux Thunk
+Redux Thunk Extended
 =============
+
+## This fork extends normal thunk and allows angular style array syntax DI in your action creators
+
+If an action is an array then this middleware will parse the string array elements and inject the required services into the action function(last array element) using the provided service resolver function.
+
+```
+const services = {
+  service1: function(){},
+  service2: function(){},
+  contestService: new ContestService()
+}
+
+getServiceFn = function(serviceName){
+  return services[serviceName]
+}
+
+const thunk = thunk.withExtraArgument(null, getServiceFn)
+```
+
+Action
+```
+export function listContests() {
+  return ['dispatch', 'getState', 'contestService'
+    (dispatch, getState, contestService) => {
+      contestService.listContests().then((contests) => {
+        dispatch(setContests(contests));
+      });
+    }
+  ]
+}
+
+store.dispatch(listContests())
+```
+
 
 Thunk [middleware](http://redux.js.org/docs/advanced/Middleware.html) for Redux.
 
-[![build status](https://img.shields.io/travis/gaearon/redux-thunk/master.svg?style=flat-square)](https://travis-ci.org/gaearon/redux-thunk) 
+[![build status](https://img.shields.io/travis/gaearon/redux-thunk/master.svg?style=flat-square)](https://travis-ci.org/gaearon/redux-thunk)
 [![npm version](https://img.shields.io/npm/v/redux-thunk.svg?style=flat-square)](https://www.npmjs.com/package/redux-thunk)
 [![npm downloads](https://img.shields.io/npm/dm/redux-thunk.svg?style=flat-square)](https://www.npmjs.com/package/redux-thunk)
 
@@ -13,7 +47,7 @@ npm install --save redux-thunk
 
 ## Note on 2.x Update
 
-Most tutorials today assume Redux Thunk 1.x so you might run into an issue when running their code with 2.x.  
+Most tutorials today assume Redux Thunk 1.x so you might run into an issue when running their code with 2.x.
 **If you use Redux Thunk 2.x in CommonJS environment, [don’t forget to add `.default` to your import](https://github.com/gaearon/redux-thunk/releases/tag/v2.0.0):**
 
 ```diff
